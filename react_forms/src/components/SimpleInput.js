@@ -1,18 +1,19 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 
 const SimpleInput = (props) => {
   // ref reads val when needed better to use when you need info submitted only once
-  const nameInputRef = useRef();
   const [enteredName, setEnteredName] = useState('');
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false);
   const [enteredNameTouched, setEnteredNameTouched] = useState(false); // control whether user inputted something or not
 
-  useEffect(() => {
-    if (enteredNameIsValid) {
-      console.log('Name input is valid');
-    }
-  }, [enteredNameIsValid]);
+  const enteredNameIsValid = enteredName.trim() !== '';
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
+
+  let formIsValid = false;
+
+  if (enteredNameIsValid) {
+    formIsValid = true;
+  }
 
   // update enteredName to setEnteredName with every key stroke that occurs during user input
   // automatically receives default event object describing the event from there get entered val 
@@ -25,11 +26,6 @@ const SimpleInput = (props) => {
     // set to true bc if input loses focus it means it was touched
     setEnteredNameTouched(true);
 
-    // if entered name is empty return(breaks function to not allow submission)
-    if (enteredName.trim() == '') {
-      setEnteredNameIsValid(false);
-      return;
-    }
   }
 
   // dont sent http request to server(doesnt reload page)
@@ -41,21 +37,18 @@ const SimpleInput = (props) => {
     setEnteredNameTouched(true);
 
     // if entered name is empty return(breaks function to not allow submission)
-    if (enteredName.trim() == '') {
-      setEnteredNameIsValid(false);
+    if (!enteredNameIsValid) {
       return;
     }
-    setEnteredName(true);
 
     console.log(enteredName);
-    const enteredValue = nameInputRef.current.value;
-    console.log(enteredValue);
 
     // clears input box after form submission when using useState()
     setEnteredName('');
+    // reset code when user submit to get rid of invalid input error after submission
+    setEnteredNameTouched(false);
   };
 
-  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
 
   // changes css style depending whether form is valid or invalid
   const nameInputClasses = nameInputIsInvalid ? 'form-control invalid' : 'form-control';
@@ -65,7 +58,6 @@ const SimpleInput = (props) => {
       <div className={nameInputClasses}>
         <label htmlFor='name'>Your Name</label>
         <input
-          ref={nameInputRef}
           type='text'
           id='name'
           onChange={nameInputChangeHandler}
@@ -75,7 +67,7 @@ const SimpleInput = (props) => {
         {enteredNameIsValid && <p className="error-text">Name must not be empty!</p>}
       </div>
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsValid}>Submit</button>
       </div>
     </form>
   );
