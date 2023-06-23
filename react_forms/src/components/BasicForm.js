@@ -7,6 +7,8 @@ const isEmail = (value) => value.includes('@');
 const BasicForm = (props) => {
   // call useInput 3 times for 3 inputs
   // custom hook returns an object full of data like values(first name, last name, email)
+  // object destructoring to pull out keys from returned object and store val in brand new constants
+  // extract value an assign alias firstNameValue
   const { 
     value: firstNameValue,
     isValid: firstNameIsValid,
